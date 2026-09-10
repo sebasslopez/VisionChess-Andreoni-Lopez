@@ -20,6 +20,6 @@ class menuScreen(Screen):
         pygame.display.flip()
 
     def handleKeyPress(self,key: int):
-        if(key == pygame.K_ESCAPE and self.vision.getScreen != None): self.vision.setScreen(menuScreen(self.screenSize))
-        elif(key == pygame.K_LEFT and self.vision.getScreen != None): self.vision.setScreen(Screen(self.screenSize))
+        if key == pygame.K_ESCAPE and self.vision.getScreen is not None: self.vision.setScreen(menuScreen(self.screenSize))
+        elif key == pygame.K_LEFT and self.vision.getScreen is not None: self.vision.setScreen(Screen(self.screenSize))
         super().handleKeyPress(key)

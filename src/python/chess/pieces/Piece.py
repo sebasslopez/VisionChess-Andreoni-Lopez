@@ -27,7 +27,7 @@ class Piece(ABC):
     
     def move(self, box: Box, board: Board):
         self.hasMoved = True
-        if(box.isEmpty() or box.piece == None):
+        if box.isEmpty() or box.piece is None:
             box.setPiece(self)
             self.position = box.position
         else:
@@ -41,7 +41,7 @@ class Piece(ABC):
         board.capturedPieces.append(self)
 
     def isTeamMate(self, otherPiece: "Piece | None") -> bool:
-        if otherPiece == None:
+        if otherPiece is None:
             return False
         return self.color == otherPiece.color
 

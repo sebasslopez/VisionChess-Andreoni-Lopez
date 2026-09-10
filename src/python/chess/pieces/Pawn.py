@@ -14,29 +14,29 @@ class Pawn(Piece):
     def getPossibleMoves(self, board: Board) -> list["Position"]:
         moves:list["Position"] = []
         dirs = [1,-1]
-        dir = dirs[self.color.value-1]
+        dirr = dirs[self.color.value - 1]
         OGpos = self.position.getTuple()
-        pos = Position(OGpos[0]+dir,OGpos[1])
+        pos = Position(OGpos[0] + dirr, OGpos[1])
         box = board.getBox(pos)
-        if(box == None): return moves
-        if(pos.isInside() and box.isEmpty()):
+        if box is None: return moves
+        if pos.isInside() and box.isEmpty():
             moves.append(pos)
             for i in dirs:
-                pos = Position(OGpos[0]+dir,OGpos[1])
+                pos = Position(OGpos[0] + dirr, OGpos[1])
                 box = board.getBox(pos)
-                if(box == None): return moves
-                if(pos.isInside() and box.isoccupied() and not self.isTeamMate(box.piece)):
+                if box is None: return moves
+                if pos.isInside() and box.isoccupied() and not self.isTeamMate(box.piece):
                     moves.append(pos)
-            pos = Position(OGpos[0]+dir*2,OGpos[1])
+            pos = Position(OGpos[0] + dirr * 2, OGpos[1])
             box = board.getBox(pos)
-            if(box == None): return moves
-            if(pos.isInside() and box.isEmpty() and not self.hasMoved):
+            if box is None: return moves
+            if pos.isInside() and box.isEmpty() and not self.hasMoved:
                 moves.append(pos)
         else:
             for i in dirs:
-                pos = Position(OGpos[0]+dir,OGpos[1]+i)
+                pos = Position(OGpos[0] + dirr, OGpos[1] + i)
                 box = board.getBox(pos)
-                if(box == None): return moves
-                if(pos.isInside() and box.isoccupied() and not self.isTeamMate(box.piece)):
+                if box is None: return moves
+                if pos.isInside() and box.isoccupied() and not self.isTeamMate(box.piece):
                     moves.append(pos)
         return moves

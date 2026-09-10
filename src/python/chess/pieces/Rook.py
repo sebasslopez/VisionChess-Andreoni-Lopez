@@ -19,21 +19,21 @@ class Rook(Piece):
         for i in dirs:
             pos = Position(OGpos[0]+i,OGpos[1])
             box = board.getBox(pos)
-            while box != None and pos.isInside() and box.isEmpty():
+            while box is not None and pos.isInside() and box.isEmpty():
                 moves.append(pos)
                 pos = Position(pos.getXYPosition()[0]+i,OGpos[1])
                 box = board.getBox(pos)
-            if(box == None): return moves
-            if(pos.isInside() and not self.isTeamMate(box.piece)):
+            if box is None: return moves
+            if pos.isInside() and not self.isTeamMate(box.piece):
                  moves.append(pos)
         for i in dirs:
                     pos = Position(OGpos[0],OGpos[1]+i)
                     box = board.getBox(pos)
-                    while box != None and pos.isInside() and box.isEmpty():
+                    while box is not None and pos.isInside() and box.isEmpty():
                         moves.append(pos)
                         pos = Position(OGpos[0],pos.getXYPosition()[1]+i)
                         box = board.getBox(pos)
-                    if(box == None): return moves
-                    if(pos.isInside() and not self.isTeamMate(box.piece)):
+                    if box is None: return moves
+                    if pos.isInside() and not self.isTeamMate(box.piece):
                          moves.append(pos)
         return moves

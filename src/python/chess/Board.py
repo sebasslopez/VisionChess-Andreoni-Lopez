@@ -42,7 +42,7 @@ class Board:
                 b: Box = Box(p,self.getBoxColor(i,j),Position(i,j))
                 row.append(b)
                 self.boxes.append(b)
-                if (p != None): self.Pieces.append(p)
+                if p is not None: self.Pieces.append(p)
             board.append(row)
         return board
 
@@ -58,7 +58,7 @@ class Board:
     def getOpositePieces(self,color:Color) -> list[Piece]:
         l:list[Piece] = []
         for p in self.Pieces:
-            if(p.color != color):
+            if p.color != color:
                 l.append(p)
         return l
     
@@ -94,15 +94,15 @@ class Board:
     def verifyClick(self,rect:tuple[int,int]):
         if self.finished: return
         b = self.getClickedBox(rect)
-        if(b == None): return
-        if(not self.isSelected):
+        if b is None: return
+        if not self.isSelected:
             self.previewBoard = self.copyBoard()
             self.SelectedBox = b
             self.isSelected = True
             self.previewBoard.board = b.makePreviewBoard(self.previewBoard)
         else:
-            if(self.SelectedBox == None or self.SelectedBox.piece == None): return
-            if((b.isEmpty() or (b.isoccupied() and not self.SelectedBox.piece.isTeamMate(b.piece))) and self.SelectedBox.piece.isMoveValid(b.position,self)):
+            if self.SelectedBox is None or self.SelectedBox.piece is None: return
+            if (b.isEmpty() or (b.isoccupied() and not self.SelectedBox.piece.isTeamMate(b.piece))) and self.SelectedBox.piece.isMoveValid(b.position, self):
                 self.SelectedBox.piece.move(b,self)
                 self.SelectedBox.clearPiece()
                 self.SelectedBox = None
@@ -111,7 +111,7 @@ class Board:
                 if self.checkFinished(): 
                     self.finished = True
                     print("JUEGO FINALIZADO!!!!!!!")
-            elif(b.piece != None and b.isoccupied() and b.piece.isTeamMate(self.SelectedBox.piece)):
+            elif b.piece is not None and b.isoccupied() and b.piece.isTeamMate(self.SelectedBox.piece):
                 self.previewBoard = self.copyBoard()
                 self.SelectedBox = b
                 self.isSelected = True
@@ -121,7 +121,7 @@ class Board:
     def getKings(self):
         l: list[Box] = []
         for b in self.boxes:
-            if(isinstance(b.piece,King)): 
+            if isinstance(b.piece, King):
                 l.append(b)
                 self.kings.append(b.piece)
         return l

@@ -20,7 +20,7 @@ class King(Piece):
              for j in dirs:
                 pos = Position(OGpos[0]+i,OGpos[1]+j)
                 box = board.getBox(pos)
-                if(box == None): return moves
+                if box is None: return moves
                 if pos.isInside() and not pos.isTheSame(self.position) and (not self.check(pos,board,self.color)) and not self.isTeamMate(box.piece):
                     moves.append(pos)
         return moves

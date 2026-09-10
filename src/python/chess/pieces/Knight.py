@@ -22,7 +22,7 @@ class Knight(Piece):
                 pos = Position(OGpos[0]+dirsf[j],OGpos[1]+dirsc[i])
                 if pos.isInside():
                     box = board.getBox(pos)
-                    if(box == None): return moves
+                    if box is None: return moves
                     if box.isEmpty() or not self.isTeamMate(box.piece):
                         moves.append(pos)
         for i in range(2,4):
@@ -30,7 +30,7 @@ class Knight(Piece):
                 pos = Position(OGpos[0]+dirsf[j],OGpos[1]+dirsc[i])
                 if pos.isInside():
                     box = board.getBox(pos)
-                    if(box == None): return moves
+                    if box is None: return moves
                     if box.isEmpty() or not self.isTeamMate(box.piece):
                         moves.append(pos)
         return moves
