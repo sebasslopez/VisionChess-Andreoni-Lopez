@@ -23,10 +23,23 @@ class King(Piece):
                 if box is None: return moves
                 if pos.isInside() and not pos.isTheSame(self.position) and (not self.check(pos,board,self.color)) and not self.isTeamMate(box.piece):
                     moves.append(pos)
+        pos = Position(OGpos[0],0)
+        if not self.hasMoved and self.canDoCastling(board,pos):
+            moves.append(pos)
+        pos = Position(OGpos[0], 7)
+        if not self.hasMoved and self.canDoCastling(board,pos):
+            moves.append(pos)
         return moves
 
     def isCheckMate(self,board: Board):
         return self.check(self.position,board,self.color) and not self.getPossibleMoves(board)
+
+    def canDoCastling(self,board:Board,position:Position):
+        return (board.getBox(position) is not None) and (board.getBox(position).piece is not None) and (not board.getBox(position).piece.hasMoved)
+
+
+    def getBoxesBetween(self,board:Board):
+        return []
 
     @staticmethod
     def check(position:Position,board: Board,color:Color) -> bool:

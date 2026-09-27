@@ -41,8 +41,7 @@ class Piece(ABC):
         board.capturedPieces.append(self)
 
     def isTeamMate(self, otherPiece: "Piece | None") -> bool:
-        if otherPiece is None:
-            return False
+        if otherPiece is None: return False
         return self.color == otherPiece.color
 
     def getTexture(self) -> pygame.Surface:
