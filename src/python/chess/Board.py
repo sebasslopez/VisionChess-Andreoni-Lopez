@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from .pieces.Piece import Piece
 
 class Board:
-    def __init__(self,flag:bool):
+    def __init__(self,flag:bool,board= ["."]*64):
         self.boxes:list[Box] = []
         self.Pieces:list[Piece] = []
         self.board:list[list[Box]] = self.createBoard(False)
@@ -26,7 +26,6 @@ class Board:
         self.kings:list[King] = []
         self.kingsBox:list[Box] = self.getKings()
         if flag: self.previewBoard = self.copyBoard()
-
     
 
     def display(self,window: pygame.Surface):
