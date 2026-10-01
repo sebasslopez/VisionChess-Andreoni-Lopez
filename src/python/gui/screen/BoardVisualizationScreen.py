@@ -6,12 +6,10 @@ from ...vision.Vision import Vision
 
 class BoardVisualizationScreen(Screen):
     def __init__(self, size: tuple[int, int]):
-        super().__init__(size, None)
-        self.vision = Vision()
-        self.Board: boar.Board = boar.Board(False,self.vision.detect())
+        super().__init__(size, None)  # self.vision = Vision()  # self.Board: boar.Board = boar.Board(False,self.vision.detect())
 
     def display(self, window: pygame.Surface):
-        self.Board.display(window)
+        # self.Board.display(window)
         pass
 
     def update(self, window: pygame.Surface, size: tuple[int, int]):
@@ -23,5 +21,5 @@ class BoardVisualizationScreen(Screen):
         super().handleKeyPress(key)
 
     def handleMouseClick(self, rect: tuple[int, int]):
-        self.Board.verifyClick(rect)
+        # self.Board.verifyClick(rect)
         pass

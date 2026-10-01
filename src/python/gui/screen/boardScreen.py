@@ -5,9 +5,9 @@ from .screen import Screen
 
     
 class boardScreen(Screen):
-    def __init__(self, size:tuple[int,int]):
+    def __init__(self, size:tuple[int,int], turns: bool = False):
         super().__init__(size, None)
-        self.Board: boar.Board = boar.Board(True)
+        self.Board: boar.Board = boar.Board(True, turns=turns)
 
     def display(self, window: pygame.Surface):
         self.Board.display(window)

@@ -11,7 +11,7 @@ class VisionChess:
         pygame.init()
         self.screenwindow :pygame.Surface | None = pygame.display.set_mode(self.screenSize, pygame.SCALED)
         self.clock:pygame.time.Clock | None = pygame.time.Clock()
-        self.screen = boardScreen(self.screenSize)
+        self.screen = boardScreen(self.screenSize, turns=True)
         pygame.display.set_caption("VisionChess")
         self.running = True
         self.run()
