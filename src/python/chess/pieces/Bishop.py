@@ -20,12 +20,10 @@ class Bishop(Piece):
              for j in dirs:
                 pos = Position(OGpos[0]+i,OGpos[1]+j)
                 box = board.getBox(pos)
-                if box is None: return moves
                 while box is not None and pos.isInside() and box.isEmpty():
                     moves.append(pos)
-                    pos = Position(pos.getXYPosition()[0]+i,pos.getXYPosition()[1]+j)
+                    pos = Position(pos.row+i, pos.col+j)
                     box = board.getBox(pos)
-                if box is None: return moves
-                if pos.isInside() and not self.isTeamMate(box.piece):
+                if box is not None and not self.isTeamMate(box.piece):
                      moves.append(pos)
         return moves

@@ -51,7 +51,7 @@ class Box:
 
     def clickInside(self,rect:tuple[int,int]) -> bool:
         r = self.position.getBoundingBox()
-        return r[0] <= rect[0] <= r[2] and r[1] <= rect[1] <= r[3]
+        return r[0] <= rect[0] <= r[0] + r[2] and r[1] <= rect[1] <= r[1] + r[3]
 
     def makePreviewBoard(self,board:Board) -> list[list["Box"]] :
         if self.piece is None: return board.board

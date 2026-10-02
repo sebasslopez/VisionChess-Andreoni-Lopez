@@ -22,19 +22,20 @@ class Piece(ABC):
         return []
 
     def isMoveValid(self, newPosition: Position, board: Board) -> bool:
-            moves:list[Position] = self.getPossibleMoves(board)
-            return newPosition in moves
+        return newPosition in self.getPossibleMoves(board)
     
     def move(self, box: Box, board: Board):
+        from .King import King
+        if isinstance(box.piece, King):
+            return
+        origin = self.position
+        target = box.position
         self.hasMoved = True
-        if box.isEmpty() or box.piece is None:
-            box.setPiece(self)
-            self.position = box.position
-        else:
+        if not box.isEmpty() and box.piece is not None:
             box.piece.capture(board)
-            box.setPiece(self)
-            self.position = box.position
-        pass
+        box.setPiece(self)
+        self.position = target
+        board.last_move = (self, origin, target)
 
     def capture(self,board: Board):
         self.isCaptured = True
