@@ -2,13 +2,16 @@ from ultralytics import YOLO
 import cv2
 import math
 import numpy as np
+from pathlib import Path
 
 
 class BoardDetector:
     """Detecta el tablero y devuelve una vista cenital sin abrir ventanas."""
 
-    def __init__(self, model_path="models/board.pt", board_size=800, margin=150):
-        self.model = YOLO(model_path)
+    def __init__(self, model_path=None, board_size=800, margin=150):
+        if model_path is None:
+            model_path = Path(__file__).resolve().parent / "models" / "board.pt"
+        self.model = YOLO(str(model_path))
         self.board_size = board_size
         self.margin = margin
         self.previous_quadrilateral = None
@@ -61,18 +64,13 @@ class BoardDetector:
         current_height = max(y for _, y in current) - min(y for _, y in current)
         if previous_width == 0 or previous_height == 0:
             return False
-        displacement = max(math.hypot((current[i][0] - previous[i][0]) / previous_width,
-                                      (current[i][1] - previous[i][1]) / previous_height) for i in range(4))
-        return (displacement <= 0.12 and 0.85 <= current_width / previous_width <= 1.15
-                and 0.85 <= current_height / previous_height <= 1.15)
+        displacement = max(math.hypot((current[i][0] - previous[i][0]) / previous_width, (current[i][1] - previous[i][1]) / previous_height) for i in range(4))
+        return (displacement <= 0.12 and 0.85 <= current_width / previous_width <= 1.15 and 0.85 <= current_height / previous_height <= 1.15)
 
     def _create_board_view(self, frame, quadrilateral):
         canvas_size = self.board_size + 2 * self.margin
         source = np.array(quadrilateral, dtype="float32")
-        destination = np.array([(self.margin, self.margin),
-                                (self.margin + self.board_size, self.margin),
-                                (self.margin + self.board_size, self.margin + self.board_size),
-                                (self.margin, self.margin + self.board_size)], dtype="float32")
+        destination = np.array([(self.margin, self.margin), (self.margin + self.board_size, self.margin), (self.margin + self.board_size, self.margin + self.board_size), (self.margin, self.margin + self.board_size)], dtype="float32")
         transform = cv2.getPerspectiveTransform(source, destination)
         board_view = cv2.warpPerspective(frame, transform, (canvas_size, canvas_size))
         cell_size = self.board_size / 8
@@ -89,12 +87,10 @@ class BoardDetector:
 
     def run(self, frame):
         """Devuelve el frame transformado, o None mientras faltan esquinas."""
-        results = self.model(frame, imgsz=(640, 640))
-        detections = [{"box": box, "confidence": confidence} for box, confidence in zip(
-            results[0].boxes.xyxy.cpu().tolist(), results[0].boxes.conf.cpu().tolist())]
+        results = self.model(frame, imgsz=(640, 640), verbose=False)
+        detections = [{"box": box, "confidence": confidence} for box, confidence in zip(results[0].boxes.xyxy.cpu().tolist(), results[0].boxes.conf.cpu().tolist())]
         detections = self._remove_overlapping_detections(detections)[:4]
-        points = [(round((item["box"][0] + item["box"][2]) / 2),
-                   round((item["box"][1] + item["box"][3]) / 2)) for item in detections]
+        points = [(round((item["box"][0] + item["box"][2]) / 2), round((item["box"][1] + item["box"][3]) / 2)) for item in detections]
         quadrilateral = self._order_points(points) if len(points) == 4 else None
         if self._is_valid_quadrilateral(quadrilateral):
             if self.previous_quadrilateral is None or self._is_similar_quadrilateral(quadrilateral, self.previous_quadrilateral):
