@@ -1,0 +1,4 @@
+{
+    "parent": "chess:custom/queen",
+	"textures": { "texture": "chess:models/queen_black" }
+}

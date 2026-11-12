@@ -1,0 +1,4 @@
+{
+    "parent": "chess:custom/knight",
+	"textures": { "texture": "chess:models/knight_white" }
+}

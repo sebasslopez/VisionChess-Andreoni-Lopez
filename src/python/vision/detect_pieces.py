@@ -90,26 +90,17 @@ class PieceDetector:
             return -1
         return column + row * 8
 
-    def run(self, frame):
+    def run(self, frame, draw=False):
         """Anota `frame` y devuelve las piezas detectadas junto a sus casillas."""
         results = self.model(frame, imgsz=640, verbose=False)
         detections = [{"box": box, "confidence": confidence, "class_id": class_id} for box, confidence, class_id in zip(results[0].boxes.xyxy.cpu().tolist(), results[0].boxes.conf.cpu().tolist(), results[0].boxes.cls.cpu().tolist(), )]
-        positions = []
         detections = self._remove_duplicate_detections(detections)
-        prom = 0
-        count = 0
         for detection in detections:
             x1, y1, x2, y2 = detection["box"]
-            top_left, bottom_right = (round(x1), round(y1)), (round(x2), round(y2))
-            piece_name = self.model.names[int(detection["class_id"])]
-            square = self._square_name((x1 + x2) / 2, (max(y1, y2) + (y1 - y2) / 4))
-            squaren = self.getBoxNumber((x1 + x2) / 2, (max(y1, y2) + (y1 - y2) / 4))
-            cv2.rectangle(frame, top_left, bottom_right, (255, 0, 0), 2)
-            cv2.putText(frame, f"{piece_name} {detection['confidence']:.2f}", (top_left[0], max(20, top_left[1] - 8)), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 0, 0), 2)
-            if square is not None:
-                conf = detection["confidence"]
-                positions.append(f"{piece_name}: {square},{squaren} ({conf:.2f})")
-                prom += conf
-                count += 1
+            if draw:
+                top_left, bottom_right = (round(x1), round(y1)), (round(x2), round(y2))
+                piece_name = self.model.names[int(detection["class_id"])]
+                cv2.rectangle(frame, top_left, bottom_right, (255, 0, 0), 2)
+                cv2.putText(frame, f"{piece_name} {detection['confidence']:.2f}", (top_left[0], max(20, top_left[1] - 8)), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 0, 0), 2)
         # print(", ".join(positions) if positions else "Sin piezas detectadas")
         return self.traducePieces(detections)

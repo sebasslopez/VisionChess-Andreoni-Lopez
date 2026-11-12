@@ -1,0 +1,6 @@
+{
+  "parent": "chess:custom/bishop",
+  "textures": {
+    "texture": "chess:models/bishop_black"
+  }
+}

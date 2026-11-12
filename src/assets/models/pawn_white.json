@@ -1,0 +1,4 @@
+{
+    "parent": "chess:custom/pawn",
+	"textures": { "texture": "chess:models/pawn_white" }
+}

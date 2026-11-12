@@ -26,6 +26,13 @@ class Board:
         self.Pieces:list[Piece] = []
         self.board:list[list[Box]] = self.createBoard(False, board)
         self.capturedPieces:list[Piece] = []
+        self.invalidPieces:list[Box] = []
+        self.grayPieces:list[Piece] = []
+        self.invalidOriginalPieces = {}
+        self.invalidMovementChanges = []
+        self.invalidBoard = None
+        self.invalidMoveRecords = []
+        self.invalidMove = False
         self.isUpsideDown = False
         self.isSelected = False
         self.SelectedBox = None
@@ -46,6 +53,10 @@ class Board:
                 if King.check(b.position, self, b.piece.color):
                     b.colorAC = Color.RED
             b.display(window)
+        if self.invalidMove:
+            font = pygame.font.Font(None, 32)
+            text = font.render("Movimiento no válido", True, (255, 80, 80))
+            window.blit(text, text.get_rect(center=(window.get_width() // 2, window.get_height() - 25)))
 
     def createBoard(self,flag:bool, board:str|None = None) -> list[list[Box]]:
         result:list[list[Box]] = []
@@ -93,6 +104,7 @@ class Board:
     def updateBoard(self, new_board: str) -> list[str]:
         if not isinstance(new_board, str) or len(new_board) != 64:
             return []
+        self._clearInvalidMove()
         changes = []
         for index, (current, new) in enumerate(zip(self.actual, new_board)):
             if current != new:
@@ -102,42 +114,33 @@ class Board:
 
         confirmed = []
         confirmed_changes = []
+        movement_candidates = self._getMovementCandidates(changes)
         castling = self._getCastlingChange(changes)
         if castling is not None:
             change_list, record = castling
             confirmed_changes.extend(change_list)
             confirmed.append(record)
         else:
-            for source in changes:
-                source_index, source_position, source_char, source_new = source
-                if source_char == "." or source_new != ".":
-                    continue
+            for source, target, promotion in movement_candidates:
+                source_position = source[1]
                 source_box = self.getBox(source_position)
                 if source_box is None or source_box.piece is None:
                     continue
-                for target in changes:
-                    target_index, target_position, target_char, target_new = target
-                    promotion = (isinstance(source_box.piece, Pawn)
-                                 and target_position.row in (0, 7)
-                                 and target_new.lower() in ("q", "r", "b", "n"))
-                    if (target_index == source_index or target_new == "."
-                            or (target_new != source_char and not promotion)):
-                        continue
-                    if target_char != "." and target_char.isupper() == source_char.isupper():
-                        continue
-                    if not source_box.piece.isMoveValid(target_position, self):
-                        continue
-                    if promotion:
-                        confirmed_changes.extend((source, target))
-                        confirmed.append(f"{Position.getAlgebraicNotation(source_position.row, source_position.col)}p{target_new.lower()}")
-                    else:
-                        confirmed_changes.extend((source, target))
-                        confirmed.append(f"{Position.getAlgebraicNotation(source_position.row, source_position.col)}m{Position.getAlgebraicNotation(target_position.row, target_position.col)}")
-                    break
-                if confirmed:
-                    break
+                target_position = target[1]
+                target_new = target[3]
+                if not source_box.piece.isMoveValid(target_position, self):
+                    continue
+                if promotion:
+                    confirmed_changes.extend((source, target))
+                    confirmed.append(f"{Position.getAlgebraicNotation(source_position.row, source_position.col)}p{target_new.lower()}")
+                else:
+                    confirmed_changes.extend((source, target))
+                    confirmed.append(f"{Position.getAlgebraicNotation(source_position.row, source_position.col)}m{Position.getAlgebraicNotation(target_position.row, target_position.col)}")
+                break
 
         if not confirmed:
+            if movement_candidates:
+                self._showInvalidMove(movement_candidates)
             return []
         updated = list(self.actual)
         for index, _, _, new in confirmed_changes:
@@ -149,6 +152,101 @@ class Board:
             self.turn = Color.BLACK if self.turn == Color.WHITE else Color.WHITE
         self.finished = self.checkFinished()
         return confirmed
+
+    def acceptInvalidMoves(self) -> list[str]:
+        if not self.invalidMove or self.invalidBoard is None:
+            return []
+        accepted_board = self.invalidBoard
+        records = self.invalidMoveRecords.copy()
+        self._clearInvalidMove()
+        self.actual = accepted_board
+        self.changeHistory.extend(records)
+        self._loadBoard(self.actual)
+        if self.turns:
+            self.turn = Color.BLACK if self.turn == Color.WHITE else Color.WHITE
+        self.finished = self.checkFinished()
+        return records
+
+    def _getMovementCandidates(self, changes):
+        candidates = []
+        sources = [change for change in changes if change[2] != "." and change[3] == "."]
+        targets = [change for change in changes if change[3] != "."]
+        for source in sources:
+            source_box = self.getBox(source[1])
+            if source_box is None or source_box.piece is None:
+                continue
+            for target in targets:
+                target_index, target_position, target_char, target_new = target
+                promotion = (isinstance(source_box.piece, Pawn)
+                             and target_position.row in (0, 7)
+                             and target_new.lower() in ("q", "r", "b", "n"))
+                if (target_index == source[0] or target_new == "."
+                        or (target_new != source[2] and not promotion)):
+                    continue
+                candidates.append((source, target, promotion))
+        return candidates
+
+    def _showInvalidMove(self, movement_candidates):
+        self.invalidMove = True
+        marked_changes = []
+        for source, target_change, _ in movement_candidates:
+            source_position = source[1]
+            source_box = self.getBox(source_position)
+            if source_box is None or source_box.piece is None:
+                continue
+            target_position = target_change[1]
+            target_box = self.getBox(target_position)
+            if target_box is None or target_box in self.invalidPieces:
+                continue
+            invalid_piece = self._createInvalidPiece(source_box.piece, target_position, target_change[3])
+            if invalid_piece is None:
+                continue
+            if source_box.piece not in self.grayPieces:
+                source_box.piece.color = Color.GRAY
+                self.grayPieces.append(source_box.piece)
+            self.invalidOriginalPieces[target_box] = target_box.piece
+            target_box.setPiece(invalid_piece)
+            self.invalidPieces.append(target_box)
+            marked_changes.append((source, target_change, _))
+        self.invalidMovementChanges = marked_changes
+        self.invalidBoard = list(self.actual)
+        self.invalidMoveRecords = []
+        for source, target, promotion in marked_changes:
+            self.invalidBoard[source[0]] = source[3]
+            self.invalidBoard[target[0]] = target[3]
+            source_position = source[1]
+            target_position = target[1]
+            if promotion:
+                self.invalidMoveRecords.append(f"{Position.getAlgebraicNotation(source_position.row, source_position.col)}p{target[3].lower()}")
+            else:
+                self.invalidMoveRecords.append(f"{Position.getAlgebraicNotation(source_position.row, source_position.col)}m{Position.getAlgebraicNotation(target_position.row, target_position.col)}")
+        self.invalidBoard = "".join(self.invalidBoard)
+
+    @staticmethod
+    def _createInvalidPiece(source_piece: Piece, position: Position, piece: str) -> Piece | None:
+        invalid_piece = Board.createPiece(position.row, position.col, False, piece)
+        if invalid_piece is None:
+            invalid_piece = type(source_piece)(Color.RED, position)
+        else:
+            invalid_piece.color = Color.RED
+        return invalid_piece
+
+    def _clearInvalidMove(self):
+        for piece in self.grayPieces:
+            piece.color = piece.ColorOG
+        for box in self.invalidPieces:
+            original_piece = self.invalidOriginalPieces.get(box)
+            if original_piece is None:
+                box.clearPiece()
+            else:
+                box.setPiece(original_piece)
+        self.invalidPieces.clear()
+        self.invalidOriginalPieces.clear()
+        self.grayPieces.clear()
+        self.invalidMovementChanges.clear()
+        self.invalidBoard = None
+        self.invalidMoveRecords.clear()
+        self.invalidMove = False
 
     def _getCastlingChange(self, changes):
         for king_change in changes:
@@ -191,6 +289,13 @@ class Board:
         self.boxes = []
         self.Pieces = []
         self.capturedPieces = []
+        self.invalidPieces = []
+        self.grayPieces = []
+        self.invalidOriginalPieces = {}
+        self.invalidMovementChanges = []
+        self.invalidBoard = None
+        self.invalidMoveRecords = []
+        self.invalidMove = False
         self.board = self.createBoard(False, board)
         self.kings = []
         self.kingsBox = self.getKings()

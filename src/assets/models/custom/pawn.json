@@ -1,0 +1,76 @@
+{
+	"format_version": "1.21.6",
+	"credit": "Model by PhantomEye",
+	"textures": {
+		"texture": "chess:models/pawn_black"
+	},
+	"elements": [
+		{
+			"from": [3, 0, 3],
+			"to": [13, 4, 13],
+			"faces": {
+				"north": {"uv": [0, 10.5, 5, 12.5], "texture": "#texture"},
+				"east": {"uv": [5, 10.5, 0, 12.5], "texture": "#texture"},
+				"south": {"uv": [5, 10.5, 0, 12.5], "texture": "#texture"},
+				"west": {"uv": [0, 10.5, 5, 12.5], "texture": "#texture"},
+				"up": {"uv": [5.5, 4.5, 10.5, 9.5], "texture": "#texture"},
+				"down": {"uv": [5.5, 10, 10.5, 15], "texture": "#texture"}
+			}
+		},
+		{
+			"from": [4, 10, 4],
+			"to": [12, 17, 12],
+			"faces": {
+				"north": {"uv": [0.5, 4, 4.5, 7.5], "texture": "#texture"},
+				"east": {"uv": [4.5, 4, 0.5, 7.5], "texture": "#texture"},
+				"south": {"uv": [4.5, 4, 0.5, 7.5], "texture": "#texture"},
+				"west": {"uv": [0.5, 4, 4.5, 7.5], "texture": "#texture"},
+				"up": {"uv": [0.5, 0, 4.5, 4], "texture": "#texture"},
+				"down": {"uv": [5, 0, 9, 4], "texture": "#texture"}
+			}
+		},
+		{
+			"from": [4, 7, 4],
+			"to": [12, 9, 12],
+			"faces": {
+				"north": {"uv": [0.5, 13, 4.5, 14], "texture": "#texture"},
+				"east": {"uv": [4.5, 13, 0.5, 14], "texture": "#texture"},
+				"south": {"uv": [4.5, 13, 0.5, 14], "texture": "#texture"},
+				"west": {"uv": [0.5, 13, 4.5, 14], "texture": "#texture"}
+			}
+		},
+		{
+			"from": [5, 4, 5],
+			"to": [11, 10, 11],
+			"faces": {
+				"north": {"uv": [1, 7.5, 4, 10.5], "texture": "#texture"},
+				"east": {"uv": [4, 7.5, 1, 10.5], "texture": "#texture"},
+				"south": {"uv": [4, 7.5, 1, 10.5], "texture": "#texture"},
+				"west": {"uv": [1, 7.5, 4, 10.5], "texture": "#texture"}
+			}
+		},
+		{
+			"from": [12, 9, 12],
+			"to": [4, 7, 4],
+			"faces": {
+				"north": {"uv": [0.5, 14, 4.5, 13], "texture": "#texture"},
+				"east": {"uv": [0.5, 14, 4.5, 13], "texture": "#texture"},
+				"south": {"uv": [0.5, 14, 4.5, 13], "texture": "#texture"},
+				"west": {"uv": [0.5, 14, 4.5, 13], "texture": "#texture"}
+			}
+		},
+		{
+			"from": [6, 17.25, 6],
+			"to": [11, 18.25, 9],
+			"rotation": {"angle": -45, "axis": "y", "origin": [8.5, 18, 7.5]},
+			"faces": {
+				"north": {"uv": [9.5, 1.5, 12, 2], "texture": "#texture"},
+				"east": {"uv": [9.5, 0.5, 11, 1], "texture": "#texture"},
+				"south": {"uv": [9.5, 1.5, 12, 2], "texture": "#texture"},
+				"west": {"uv": [9.5, 0.5, 11, 1], "texture": "#texture"},
+				"up": {"uv": [9.5, 2.5, 12, 4], "rotation": 180, "texture": "#texture"},
+				"down": {"uv": [9.5, 2.5, 12, 4], "rotation": 180, "texture": "#texture"}
+			}
+		}
+	]
+}

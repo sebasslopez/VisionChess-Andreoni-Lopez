@@ -50,6 +50,8 @@ class VisionChess:
 
     def stop(self):
         self.running = False
+        if self.screen is not None and hasattr(self.screen, "stop"):
+            self.screen.stop()
         pygame.quit()
 
 

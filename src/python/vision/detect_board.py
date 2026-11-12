@@ -85,16 +85,17 @@ class BoardDetector:
         """Olvida las esquinas actuales para forzar un cálculo nuevo."""
         self.previous_quadrilateral = None
 
-    def run(self, frame):
+    def run(self, frame, detect_board=True):
         """Devuelve el frame transformado, o None mientras faltan esquinas."""
-        results = self.model(frame, imgsz=(640, 640), verbose=False)
-        detections = [{"box": box, "confidence": confidence} for box, confidence in zip(results[0].boxes.xyxy.cpu().tolist(), results[0].boxes.conf.cpu().tolist())]
-        detections = self._remove_overlapping_detections(detections)[:4]
-        points = [(round((item["box"][0] + item["box"][2]) / 2), round((item["box"][1] + item["box"][3]) / 2)) for item in detections]
-        quadrilateral = self._order_points(points) if len(points) == 4 else None
-        if self._is_valid_quadrilateral(quadrilateral):
-            if self.previous_quadrilateral is None or self._is_similar_quadrilateral(quadrilateral, self.previous_quadrilateral):
-                self.previous_quadrilateral = quadrilateral
+        if detect_board or self.previous_quadrilateral is None:
+            results = self.model(frame, imgsz=(640, 640), verbose=False)
+            detections = [{"box": box, "confidence": confidence} for box, confidence in zip(results[0].boxes.xyxy.cpu().tolist(), results[0].boxes.conf.cpu().tolist())]
+            detections = self._remove_overlapping_detections(detections)[:4]
+            points = [(round((item["box"][0] + item["box"][2]) / 2), round((item["box"][1] + item["box"][3]) / 2)) for item in detections]
+            quadrilateral = self._order_points(points) if len(points) == 4 else None
+            if self._is_valid_quadrilateral(quadrilateral):
+                if self.previous_quadrilateral is None or self._is_similar_quadrilateral(quadrilateral, self.previous_quadrilateral):
+                    self.previous_quadrilateral = quadrilateral
         if self.previous_quadrilateral is None:
             return None
         return self._create_board_view(frame, self.previous_quadrilateral)

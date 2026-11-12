@@ -1,0 +1,4 @@
+{
+    "parent": "chess:custom/king",
+	"textures": { "texture": "chess:models/king_black_broken" }
+}

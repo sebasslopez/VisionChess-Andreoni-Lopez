@@ -1,0 +1,4 @@
+{
+    "parent": "chess:custom/rook",
+	"textures": { "texture": "chess:models/rook_white" }
+}

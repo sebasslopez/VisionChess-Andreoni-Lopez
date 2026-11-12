@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 class Piece(ABC):
     def __init__(self, color: Color, position: Position):
         self.color: Color = color
+        self.ColorOG: Color = color
         self.position = position
         self.hasMoved = False
         self.isCaptured = False
